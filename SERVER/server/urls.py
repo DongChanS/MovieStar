@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.views.generic import TemplateView
+from django.conf.urls import url,include
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
+    path('api/v1/', include('movies.urls')),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
