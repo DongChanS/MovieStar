@@ -1,0 +1,23 @@
+  <nav class="navbar">
+    <a class="navbar-brand" href="{% url 'index' %}">Pesudo Movie</a>
+    <div id="navbarNav">
+      <ul class="navbar-nav" style="float: right;">
+      <!-- 로그인 -> Profile, 로그아웃 // 로그인안됨 -> 로그인, 회원가입 -->
+      {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:change' %}">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:signup' %}">SignUp</a>
+        </li>
+      {% endif %}
+      </ul>
+    </div>
+  </nav>
