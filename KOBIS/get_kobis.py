@@ -7,10 +7,9 @@ import time
 import urllib.request
 
 class Kobis:
-    boxoffice_columns = ['대표코드','영화명','누적관객수','해당일']
-    detail_columns = ["대표코드","영화명(국문)","영화명(영문)","영화명(원문)",
-              "개봉연도","상영시간","장르","감독","관람등급","배우1","배우2","배우3"]
-    naver_columns = ["대표코드","img_url","link","평점"]
+    boxoffice_columns = ['대표코드','name','audiance']
+    detail_columns = ["대표코드","open_day","duration","genres","directors","watch_grade","actors"]
+    naver_columns = ["대표코드","image","link","avgScore"]
     
     @staticmethod
     def get_request_dict(url,headers=None):
@@ -24,7 +23,10 @@ class Kobis:
         self.weeks = weeks
         self.dates = []
         self.__key = key
-        self.codes = []
+        self.codes = set()
+        self.movie_names = set()
+        self.quries = set()
+        self.actors = set()
         
     def get_dates(self):
         dates = [self.last_date-x*datetime.timedelta(7) for x in range(self.weeks)]
@@ -40,27 +42,16 @@ class Kobis:
         for movie in weekly_dict:
             movieCd = movie.get('movieCd')
             movieNm = movie.get('movieNm')
-            audiAcc = movie.get('audiAcc')
-            boxoffice.append([movieCd,movieNm,audiAcc,date])
+            if movieNm not in self.movie_names:
+                self.movie_names.add(movieNm)
+                self.codes.add(movieCd)
+            else:
+                continue
             
-        return boxoffice
-    
-    @staticmethod
-    def modify_audiAcc(df):
-        each_movies = []
+            audiAcc = movie.get('audiAcc')
+            boxoffice.append([movieCd,movieNm,audiAcc])
         
-        for key in df.groupby('영화명').groups:
-            movie_indices = df.groupby('영화명').groups[key]
-            movie_df = df.loc[movie_indices]
-            movie_df['누적관객수'] = movie_df['누적관객수'].describe()['top']
-            each_movies.append(movie_df)
-
-        result = pd.concat(each_movies)
-        result = result.reset_index()
-        result = result.drop(['index'],axis=1)
-
-        return result 
-    
+        return boxoffice 
     
     def get_whole_boxoffice(self):
         boxoffice_list = []
@@ -76,27 +67,19 @@ class Kobis:
         self.boxoffice = pd.DataFrame(boxoffice_list,columns=Kobis.boxoffice_columns)
         self.boxoffice = self.boxoffice.reset_index()
         self.boxoffice = self.boxoffice.drop('index',axis=1)
-        
-        return Kobis.modify_audiAcc(self.boxoffice)
-    
-    @staticmethod
-    def save_to_csv(df,filename):
-        df.to_csv(filename)
-    
-    def get_movieCds(self):
-        self.codes = pd.unique(self.boxoffice['대표코드'])
 
     def get_whole_movieinfo(self):
         base_url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json"
         movieinfo = []
-    
+        
+        print("박스오피스 상세정보 수집중...")
         for code in self.codes:
             url = base_url + f"?key={self.__key}&movieCd={code}"
             res_dict = Kobis.get_request_dict(url)['movieInfoResult']['movieInfo']
-
-            movieNm = res_dict.get('movieNm')
-            movieNmEn = res_dict.get('movieNmEn')
-            movieNmOg = res_dict.get('movieNmOg')
+            
+            kor_name = res_dict.get('movieNm')
+            self.quries.add(kor_name)
+            
             openDt = res_dict.get('openDt')
             showTm = res_dict.get('showTm')
             genres = res_dict.get('genres')
@@ -104,67 +87,88 @@ class Kobis:
             audits = res_dict.get('audits')
             actors = res_dict.get('actors')
 
-            director_names = "/".join([dir_dict.get('peopleNm') for dir_dict in directors])
-            genre_names = "/".join([gen_dict.get('genreNm') for gen_dict in genres])
+            director_names = "|".join([dir_dict.get('peopleNm') for dir_dict in directors])
+            genre_names = "|".join([gen_dict.get('genreNm') for gen_dict in genres])
             watchGradeNms = audits[0].get('watchGradeNm')
-            actor_names = [act_dict.get('peopleNm') for act_dict in actors[:3]]
-            actor_names += ["" for _ in range(len(actor_names),3)]
+            actor_list = [act_dict.get('peopleNm') for act_dict in actors]
+            self.actors.update(actor_list)
+            actor_names = "|".join([act_dict.get('peopleNm') for act_dict in actors])
 
-            info_list = [code,movieNm,movieNmEn,movieNmOg,openDt,showTm,
-                             genre_names,director_names,watchGradeNms]+actor_names
+            info_list = [code,openDt,showTm,genre_names,director_names,watchGradeNms,actor_names]
 
             movieinfo.append(info_list)
-            print(movieNm+" 영화 정보 수집 완료!")
-            
+
         self.movie_info = pd.DataFrame(movieinfo,columns=Kobis.detail_columns)
-        
-        return self.movie_info
-        
-    def get_naver_movies(self,naver_id,naver_key):
+                
+    def get_naver_movies(self,NAVER_ID,NAVER_SECRET):
         base_url = "https://openapi.naver.com/v1/search/movie.json"
         naver_movie = []
+        headers = {
+            "X-Naver-Client-Id" : NAVER_ID,
+            "X-Naver-Client-Secret" : NAVER_SECRET
+        }
+        print("네이버 영화 수집중...")
         
         for query,code in zip(self.quries,self.codes):
             url = base_url + f"?query={query}"
-            headers = {
-                "X-Naver-Client-Id" : naver_id,
-                "X-Naver-Client-Secret" : naver_key
-            }
+
             res_dict = self.get_request_dict(url,headers).get('items')[0]
             image_url = res_dict.get('image')
             link = res_dict.get('link')
             avg_score = res_dict.get('userRating')
-            time.sleep(0.5)
+            time.sleep(0.3)
             naver_movie.append([code,image_url,link,avg_score])
-            print(query+" 네이버 영화 정보 수집 완료!")
         
-        return pd.DataFrame(naver_movie,columns=Kobis.naver_columns)
+        self.naver_movies = pd.DataFrame(naver_movie,columns=Kobis.naver_columns)
     
+    def merge(self):
+        merged = pd.merge(kobis.boxoffice, kobis.movie_info, on="대표코드")
+        merged = pd.merge(merged, naver_df)
+        return merged
     
-    def get_quries(self):
-        self.quries = self.movie_info['영화명(국문)']
+    def all_in_one(self,NAVER_ID,NAVER_SECRET):
+        self.get_dates()
+        self.get_whole_boxoffice()
+        self.get_whole_movieinfo()
+        self.get_naver_movies(NAVER_ID,NAVER_SECRET)
+        return self.merge()
     
-    @staticmethod
-    def image_download(url,filename):
-        urllib.request.urlretrieve(url,filename)
+    def get_actor_info(self, actor_name):
+        base_url = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/people/searchPeopleList.json"
+        url = base_url + f"?key={self.__key}&peopleNm={actor_name}&itemPerPage=1"
         
+        return Kobis.get_request_dict(url)['peopleListResult']['peopleList']
+    
+    def get_actor_image(self,actor_name,NAVER_ID,NAVER_SECRET):
+        base_url = "https://openapi.naver.com/v1/search/image"
+        url = base_url + f"?query={actor_name}&sort=sim&filter=large&display=1"
 
-if __name__ == "__main__":
-    KOBIS_KEY = os.environ['KOBIS_KEY']
-    kobis = Kobis(datetime.date(2019,4,1),5,KOBIS_KEY)
-    #------------------
-    kobis.get_dates()
-    boxoffice_df = kobis.get_whole_boxoffice()
-    # kobis.save_to_csv(boxoffice_df,"boxoffice.csv")
-    #------------------
-    kobis.get_movieCds()
-    movieinfo_df = kobis.get_whole_movieinfo()
-    # kobis.save_to_csv(movieinfo_df,"movie.csv")
-    #-------------------
-    kobis.get_quries()
-    NAVER_ID = os.environ['NAVER_ID']
-    NAVER_SECRET = os.environ['NAVER_SECRET']
-    naver_df = kobis.get_naver_movies(NAVER_ID,NAVER_SECRET)
-    # kobis.save_to_csv(naver_df,"movie_naver.csv")
-    #-----------------
-   
+        headers = {
+            "X-Naver-Client-Id" : NAVER_ID,
+            "X-Naver-Client-Secret" : NAVER_SECRET
+        }
+
+        return Kobis.get_request_dict(url, headers)['items']
+    
+    
+    def get_whole_actor_data(self,NAVER_ID,NAVER_SECRET):
+        
+        actor_infos = []
+        
+        for name in self.actors:
+            kobis_res = self.get_actor_info(name)
+            if kobis_res:
+                filmo_names = kobis_res[0]['filmoNames']
+            else:
+                continue
+                
+            naver_res = self.get_actor_image(name,NAVER_ID,NAVER_SECRET)
+            if naver_res:
+                profile_img = naver_res[0]['link']
+            else:
+                continue
+                
+            print(name+" 인물정보 수집 완료!")
+            actor_infos.append([name, filmo_names, profile_img])
+        
+        self.actor_infos = pd.DataFrame(actor_infos, columns=['이름','출연작','이미지링크'])
