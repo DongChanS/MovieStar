@@ -152,4 +152,7 @@ dmypy.json
 *.rss
 *.xhtml
 
+### image files ###
+*/good_articles
+
 # End of https://www.gitignore.io/api/web
