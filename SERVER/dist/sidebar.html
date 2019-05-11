@@ -1,0 +1,19 @@
+<nav class="col-md-3 d-none d-md-block sidebar border border-dark">
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+      <li class="nav-item
+        {% if 'password' in request.get_full_path %}
+          sidebar-hover
+        {% endif %}">
+          <a class="nav-link" href="{% url 'accounts:password' %}">비밀번호 변경</a>
+      </li>
+      
+      <li class="nav-item 
+        {% if 'change' in request.get_full_path %}
+          sidebar-hover
+        {% endif %}">
+          <a class="nav-link" href="{% url 'accounts:change' %}">프로필 수정</a>
+      </li>
+    </ul>
+  </div>
+</nav>
