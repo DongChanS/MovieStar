@@ -3,13 +3,13 @@
 {% load static %}
 
 {% block content %}
-<div id="app">
+<div>
   <!-- 1. 영화 목록 보기 -->
   <div id="list" class="main-skin">
    <div class="text-center sub-skin">
      <div class="sub-font">
        <div>영화목록 보기</div>
-       <a class="btn btn-danger btn-lg sub-anchor" href="">시작하기</a>    
+       <a class="btn btn-danger btn-lg sub-anchor" href="{% url 'movie' %}">시작하기</a>    
      </div>
    </div>
   </div>
