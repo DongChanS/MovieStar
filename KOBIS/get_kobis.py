@@ -16,7 +16,7 @@ class Kobis:
         try:
             return requests.get(url,headers=headers).json()
         except Exception as e:
-            print(e.message, e.args)
+            print(e)
     
     def __init__(self,last_date,weeks,key):
         self.last_date = last_date
@@ -89,8 +89,11 @@ class Kobis:
 
             director_names = "|".join([dir_dict.get('peopleNm') for dir_dict in directors])
             genre_names = "|".join([gen_dict.get('genreNm') for gen_dict in genres])
-            watchGradeNms = audits[0].get('watchGradeNm')
-            actor_list = [act_dict.get('peopleNm') for act_dict in actors]
+            if audits:
+                watchGradeNms = audits[0].get('watchGradeNm')
+            else:
+                watchGradeNms = None
+            actor_list = [act_dict.get('peopleNm') for act_dict in actors][:3]
             self.actors.update(actor_list)
             actor_names = "|".join([act_dict.get('peopleNm') for act_dict in actors])
 
@@ -112,7 +115,11 @@ class Kobis:
         for query,code in zip(self.quries,self.codes):
             url = base_url + f"?query={query}"
 
-            res_dict = self.get_request_dict(url,headers).get('items')[0]
+            res_dict = self.get_request_dict(url,headers).get('items')
+            if res_dict:
+                res_dict = res_dict[0]
+            else:
+                continue
             image_url = res_dict.get('image')
             link = res_dict.get('link')
             avg_score = res_dict.get('userRating')
@@ -123,7 +130,7 @@ class Kobis:
     
     def merge(self):
         merged = pd.merge(kobis.boxoffice, kobis.movie_info, on="대표코드")
-        merged = pd.merge(merged, naver_df)
+        merged = pd.merge(merged, self.naver_movies)
         return merged
     
     def all_in_one(self,NAVER_ID,NAVER_SECRET):
@@ -168,7 +175,6 @@ class Kobis:
             else:
                 continue
                 
-            print(name+" 인물정보 수집 완료!")
             actor_infos.append([name, filmo_names, profile_img])
         
         self.actor_infos = pd.DataFrame(actor_infos, columns=['이름','출연작','이미지링크'])
