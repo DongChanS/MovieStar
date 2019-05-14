@@ -1,0 +1,149 @@
+[
+    {
+        "pk": 0,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "공포(호러)"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "성인물(에로)"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "드라마"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "뮤지컬"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "액션"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "미스터리"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "판타지"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "코미디"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "어드벤처"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "SF"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "스릴러"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "가족"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "범죄"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "기타"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "공연"
+        }
+    },
+    {
+        "pk": 15,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "서부극(웨스턴)"
+        }
+    },
+    {
+        "pk": 16,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "사극"
+        }
+    },
+    {
+        "pk": 17,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "다큐멘터리"
+        }
+    },
+    {
+        "pk": 18,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "멜로/로맨스"
+        }
+    },
+    {
+        "pk": 19,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "전쟁"
+        }
+    },
+    {
+        "pk": 20,
+        "model": "movies.Genre",
+        "fields": {
+            "name": "애니메이션"
+        }
+    }
+]
