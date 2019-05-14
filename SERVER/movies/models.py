@@ -5,15 +5,14 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 class Genre(models.Model):
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class Actor(models.Model):
     name = models.CharField(max_length=40)
-    age = models.IntegerField()
-    tenure = models.IntegerField()  # 경력
-    is_actor = models.BooleanField(default=False) # 배우인지 아닌지
-    is_director = models.BooleanField(default=False) # 감독인지 아닌지
+    filmography = models.TextField()
     profile_image = models.ImageField(blank=True)
-    nation = CountryField()
 
 class Review(models.Model):
     title = models.CharField(max_length=100)
@@ -30,13 +29,15 @@ class Review(models.Model):
 
 class Movie(models.Model):
     name = models.CharField(max_length=40)
-    open_day = models.DateField() # 날짜만 기록 
+    open_day = models.CharField(max_length=40) # 날짜만 기록 
     audiance = models.IntegerField()
     duration = models.IntegerField() # ex) 2시간 2분 => 122로 저장
-    nation = CountryField() # https://github.com/SmileyChris/django-countries/
     watch_grade = models.IntegerField() # 15세이상관람가 => 15로 저장
     image = models.ImageField(blank=True) # 포스터 이미지
     
     genres = models.ManyToManyField(Genre, related_name="movies")
     like_users = models.ManyToManyField(get_user_model(), related_name="like_movies")
     actors = models.ManyToManyField(Actor, related_name="act_movies")
+    
+    def __str__(self):
+        return self.name + "이미지 : " + str(self.image)

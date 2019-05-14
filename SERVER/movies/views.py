@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from .models import *
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 @api_view(['GET'])
@@ -27,6 +28,14 @@ def movie_list(request):
     movies = Movie.objects.all()
     serializers = MovieSerializer(movies, many=True)
     return Response(serializers.data)
+    
+    
+@api_view(['GET'])
+def movie_page(request,page_num):
+    # GET, 영화 전체 목록
+    movies = Movie.objects.all()[page_num*6 : page_num*6+6]
+    serializers = MovieSerializer(movies, many=True)
+    return Response(serializers.data)
 
 @api_view(['GET'])
 def detail_movie(request, movie_pk):
@@ -35,6 +44,7 @@ def detail_movie(request, movie_pk):
     serializers = MovieSerializer(movie, many=False)
     return Response(serializers.data)
 
+
 @api_view(['GET', 'POST'])
 def movie_review(request, movie_pk):
     # POST, 평점 생성
@@ -42,13 +52,15 @@ def movie_review(request, movie_pk):
     movie = get_object_or_404(Movie, pk=movie_pk)
     if request.method == "POST":
         serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid() and request.user.is_authenticated:
             serializer.save(movie_id=movie.id)
-            return Response({'massage' : "작성되었습니다."})
+            serializer.save(user_id=user.id)
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         serializer = ReviewSerializer(movie.review_set.all(), many=True)
         return Response(serializer.data)
+
 
 @api_view(['GET','PUT','DELETE'])
 def review(request, review_pk):
