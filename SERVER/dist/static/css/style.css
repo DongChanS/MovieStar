@@ -1,0 +1,411 @@
+
+/* global */
+
+body {
+    font-family: 'Black Han Sans', sans-serif;
+}
+
+header {
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+
+img {
+   background-image: url('/static/img/default-movie.png')
+}
+
+a {
+    color: inherit;
+}
+
+#app h1 {
+    margin-top: 20px;
+}
+
+
+.main-container {
+    background-color: #FAFAFA;
+    border : 1px solid #181818;
+    padding : 0;
+}
+
+@media (min-width: 768px) {
+    .container-small {
+        width: 500px;
+    }
+    .container-large {
+        width: 970px;
+    } 
+} 
+@media (min-width: 992px) {
+    .container-small {
+        width: 600px;
+    }
+    .container-large {
+        width: 1170px;
+    } 
+} 
+@media (min-width: 1200px) {
+    .container-small {
+        width: 700px;
+    }
+    .container-large {
+        width: 1500px;
+    } 
+}
+
+.container-small, .container-large {
+    max-width: 100%;
+}
+
+/* navbar */
+
+.navbar {
+    font-family: 'Orbitron', sans-serif;
+    background-color: #b12b2b;
+    justify-content : flex-start;
+}
+
+.navbar a {
+    font-weight : 700;
+    color: #fff;
+}
+
+/* index page */
+
+.scroll {
+    text-align : center;
+    cursor : pointer;
+}
+
+.scroll .fas {
+    font-size : 1.5rem;
+}
+
+
+
+.main-skin#list {
+    background: no-repeat center / cover  url("/static/img/movie-info.jpg");
+    height: 400px;
+}
+
+.main-skin#actor {
+    background: no-repeat center / cover  url("/static/img/actor.jpg");
+    height: 400px;
+}
+
+.main-skin#recommend {
+    background: no-repeat center / cover  url("/static/img/rec.jpg");
+    height: 400px;
+}
+
+
+.sub-skin {
+    height: 400px;
+    background-color: #181818;
+    opacity: 0.7;
+    position: relative;
+}
+
+.sub-font {
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+    left: 15%;
+    right: 15%;
+    font-size: 4rem;
+    color: #fff;
+}
+
+.sub-anchor:not(::hover) {
+    color: #fff;
+}
+
+/* accounts app */
+
+.account-main {
+    padding-left: 15px;
+    padding-right: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    margin-top: 1.5rem;
+}
+
+.sidebar-hover {
+    color : red;
+}
+
+.good_article {
+    margin-top : 15px;
+    width : 100%;
+}
+
+/* movie page */
+
+
+.title{
+    font-family: 'Nanum Gothic', sans-serif;
+    font-weight : 700;
+}
+
+
+.movie-img {
+    height : 292.5px;
+}
+
+.movie-card {
+    margin-bottom: 20px
+}
+
+.movie-info {
+    height : 250px;
+}
+
+.paginate {
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+    background: #fff;
+    margin-top: 46px;
+    padding-bottom: 70px;
+}
+
+.paginate a {
+    font-size: 15px;
+    font-family: verdana,sans-serif;
+    min-width: 30px;
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+    margin-left: 4px;
+    color: #666;
+    cursor: pointer;
+}
+
+
+.current {
+    font-weight : 700;
+    color: #00c73c;
+    border: 1px solid #00c73c;
+}
+
+
+.card-body {
+    min-height : 70px;
+}
+
+.card-text {
+    /*color: #fff;*/
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+#memo-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.memo {
+  position: relative;
+  background-color: #270A04;
+  width: 100%;
+  height: 500px;
+  overflow: auto;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1.5rem;
+  box-shadow: rgba(46, 41, 51, 0.08) 1px 2px 2px, rgba(71, 63, 79, 0.08) 2px 4px 4px;
+}
+
+.memo-delete-button {
+  cursor: pointer;
+}
+
+.memo div {
+    font-family: 'Nanum Gothic', sans-serif;
+    color : #f5f5dc;
+}
+
+.movie-title {
+    font-weight: 700;
+}
+
+.sub-title {
+    font-weight: lighter;
+    color : #808080;
+}
+
+.temp-review {
+    /*background-color: #ae9071;*/
+    color: #fff;
+}
+
+.temp-hr {
+    border : 1.5px dotted #4A2D27
+}
+
+.review-title {
+    display: inline-block;
+    overflow: hidden;
+    max-width: 320px;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+#review-title-hr {
+    border : 1.5px solid #4A2D27;
+}
+
+.user {
+    display: inline-block;
+    max-width: 340px;
+    font-size: 13px;
+    color: #999;
+    vertical-align: top;
+}
+
+em {
+    display: inline-block;
+    padding-left: 9px;
+    margin-left: 4px;
+    font-size: 13px;
+    /*font-family: 나눔고딕, NanumGothic, dotum, Helvetica, sans-serif;*/
+    letter-spacing: -1px;
+    color: rgb(153, 153, 153);
+    background: url(https://ssl.pstatic.net/static/movie/2012/06/bg_tx_line2.gif) 0px 2px no-repeat;
+}
+
+.memo p {
+    background-image: url(https://ssl.pstatic.net/static/movie/2014/01/blank.gif);
+    font-size: 13px;
+    /*color: #666;*/
+    line-height: 22px;
+    letter-spacing: -1px;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+/* actor page */
+
+.actor {
+    margin-left : 0;
+    margin-right : 0;
+}
+
+.actor-card {
+    margin-bottom: 20px;
+    border : none;
+    background-color : inherit;
+}
+
+/* recommend page */
+
+.form {
+    font-family: 'Roboto', sans-serif;
+}
+
+.purple-bar {
+    background-color: rgb(103, 58, 183);
+    height : 184px;
+}
+
+.pink-container {
+    background-color: #F0EBF8;
+    height : 1200px;
+    position: relative;
+}
+
+.white-form {
+    background-color: #fff;
+    height : inherit;
+    position: absolute;
+    top : -50px;
+    left: 20%;
+    right: 20%;
+}
+
+.white-bar {
+    height : 50px;
+    font-size : 2rem;
+    vertical-align: central;
+    position: relative;
+    top: 10px;
+}
+
+.form-box {
+    margin-bottom : 40px;
+}
+
+.form-input {
+    margin-top : 40px;
+    border : none;
+    display : inline-block;
+    width : 100%;
+}
+
+.form-dashline {
+    border : 0.5px dotted #181818;
+}
+
+.form-require {
+    color: #db4437;
+    margin-right: 24px;
+    padding-left: .25em;
+}
+
+.form-button {
+    margin : 40px;
+}
+
+/* search-bar */
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+  background: #f2f2f2;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.search {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.searchTerm {
+  width: 100%;
+  border: 3px solid #00B4CC;
+  border-right: none;
+  padding: 5px;
+  height: 20px;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  color: #9DBFAF;
+}
+
+.searchTerm:focus{
+  color: #00B4CC;
+}
+
+.searchButton {
+  width: 40px;
+  height: 36px;
+  border: 1px solid #00B4CC;
+  background: #00B4CC;
+  text-align: center;
+  color: #fff;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/*Resize the wrap to see the search bar change!*/
+.wrap{
+  width: 30%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
