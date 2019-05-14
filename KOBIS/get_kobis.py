@@ -114,16 +114,17 @@ class Kobis:
         
         for query,code in zip(self.quries,self.codes):
             url = base_url + f"?query={query}"
-
+            time.sleep(0.3)
             res_dict = self.get_request_dict(url,headers).get('items')
             if res_dict:
                 res_dict = res_dict[0]
             else:
-                continue
+                res_dict = {}
+                
             image_url = res_dict.get('image')
             link = res_dict.get('link')
             avg_score = res_dict.get('userRating')
-            time.sleep(0.3)
+            
             naver_movie.append([code,image_url,link,avg_score])
         
         self.naver_movies = pd.DataFrame(naver_movie,columns=Kobis.naver_columns)
