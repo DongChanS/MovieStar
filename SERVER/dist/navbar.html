@@ -5,14 +5,14 @@
       <img src="{% static 'img/troll_attack.gif' %}" style="height:90px;">
     </div>
     <div class="col-6" style="padding-left : 25px">
-      <a class="navbar-brand" href="{% url 'index' %}">Troll Movie</a>
+      <a class="navbar-brand" href="{% url 'index' %}"><h2>Troll Movie</h2></a>
     </div>
     <div id="navbarNav" class="col-4">
       <ul class="navbar-nav" style="float: right;">
       <!-- 로그인 -> Profile, 로그아웃 // 로그인안됨 -> 로그인, 회원가입 -->
       {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'accounts:change' %}">Profile</a>
+          <a class="nav-link" href="{% url 'accounts:change' %}">ProfileChange</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
