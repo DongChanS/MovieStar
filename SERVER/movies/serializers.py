@@ -16,7 +16,7 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class GenreMovieSerializer(serializers.ModelSerializer):
-    movies = MovieSerializer(source="movie_set", many=True, read_only=True)
+    movies = MovieSerializer(many=True, read_only=True)
     class Meta:
         model = Genre
         fields = ['id', 'movies', 'name']
@@ -25,4 +25,15 @@ class GenreMovieSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['title','score','content','user','movie']
+        fields = ['id','title','score','content','user','movie','created_at']
+        
+class ActorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actor
+        fields = "__all__"
+        
+class WriteReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id','title','score','content']
+        
