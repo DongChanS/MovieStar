@@ -5,6 +5,10 @@ body {
     font-family: 'Black Han Sans', sans-serif;
 }
 
+.card {
+    cursor : pointer;
+}
+
 header {
     font-family: 'Nanum Gothic', sans-serif;
 }
@@ -64,6 +68,10 @@ a {
     font-family: 'Orbitron', sans-serif;
     background-color: #b12b2b;
     justify-content : flex-start;
+}
+
+.nav-link {
+    display: inline;
 }
 
 .navbar a {
@@ -140,6 +148,13 @@ a {
 }
 
 /* movie page */
+
+.troll_score {
+    font-size : 2rem;
+    color : yellow;
+    background-color : #181818;
+    cursor : pointer;
+}
 
 
 .title{
@@ -236,7 +251,6 @@ a {
 }
 
 .temp-review {
-    /*background-color: #ae9071;*/
     color: #fff;
 }
 
@@ -248,7 +262,7 @@ a {
     display: inline-block;
     overflow: hidden;
     max-width: 320px;
-    font-size: 14px;
+    font-size: 20px;
     white-space: nowrap;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -271,7 +285,6 @@ em {
     padding-left: 9px;
     margin-left: 4px;
     font-size: 13px;
-    /*font-family: 나눔고딕, NanumGothic, dotum, Helvetica, sans-serif;*/
     letter-spacing: -1px;
     color: rgb(153, 153, 153);
     background: url(https://ssl.pstatic.net/static/movie/2012/06/bg_tx_line2.gif) 0px 2px no-repeat;
@@ -300,6 +313,34 @@ em {
     background-color : inherit;
 }
 
+.actor-page {
+    background-color : #794044;
+}
+
+.actor-info {
+    position: relative;
+}
+
+.heart {
+    text-align: center;
+    position: relative;
+    top : 5%;
+    bottom: 20%;
+    right: 15%;
+    left: 5%;
+    cursor : pointer;
+}
+
+.heart .fa-heart {
+    color: red;
+    font-size: 9rem;
+}
+
+.heart .fa-heart-broken {
+    color : #000000;
+    font-size: 9rem;
+}
+
 /* recommend page */
 
 .form {
@@ -315,6 +356,7 @@ em {
     background-color: #F0EBF8;
     height : 1200px;
     position: relative;
+
 }
 
 .white-form {
@@ -329,24 +371,34 @@ em {
 .white-bar {
     height : 50px;
     font-size : 2rem;
-    vertical-align: central;
     position: relative;
     top: 10px;
 }
 
+.description {
+    margin-top : 30px;
+}
+
 .form-box {
     margin-bottom : 40px;
+    margin-left : 15px;    
+    margin-right : 15px;
 }
 
 .form-input {
-    margin-top : 40px;
     border : none;
     display : inline-block;
     width : 100%;
+    height : 20px;
+}
+
+.form-waiting {
+    border : 1px solid red;
 }
 
 .form-dashline {
     border : 0.5px dotted #181818;
+    margin-top : 0;
 }
 
 .form-require {
@@ -359,53 +411,24 @@ em {
     margin : 40px;
 }
 
-/* search-bar */
-
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
-
-body{
-  background: #f2f2f2;
-  font-family: 'Open Sans', sans-serif;
+.form-searchResult {
+    height : 30px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border : 0.5px solid #181818;
+    cursor : pointer;
 }
 
-.search {
-  width: 100%;
-  position: relative;
-  display: flex;
+.form-searchResult img{
+    height : 30px;
+    width : auto;
 }
 
-.searchTerm {
-  width: 100%;
-  border: 3px solid #00B4CC;
-  border-right: none;
-  padding: 5px;
-  height: 20px;
-  border-radius: 5px 0 0 5px;
-  outline: none;
-  color: #9DBFAF;
+.result-img {
+    width : 70%;
+    height : auto;
 }
 
-.searchTerm:focus{
-  color: #00B4CC;
-}
-
-.searchButton {
-  width: 40px;
-  height: 36px;
-  border: 1px solid #00B4CC;
-  background: #00B4CC;
-  text-align: center;
-  color: #fff;
-  border-radius: 0 5px 5px 0;
-  cursor: pointer;
-  font-size: 20px;
-}
-
-/*Resize the wrap to see the search bar change!*/
-.wrap{
-  width: 30%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.result-form {
+    height : 1000px;
 }
