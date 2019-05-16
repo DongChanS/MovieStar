@@ -18,13 +18,14 @@ from django.urls import path
 from django.views.generic import TemplateView
 from django.conf.urls import url,include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from accounts import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='index.html'), name="index"),
     path('movie/',TemplateView.as_view(template_name="movie.html"), name="movie"),
     path('actor/',TemplateView.as_view(template_name="actor.html"), name="actor"),
-    path('recommend/',TemplateView.as_view(template_name="recommend.html"), name="recommend"),
+    path('recommend/', views.recommend, name="recommend"),
     path('api/v1/', include('movies.urls')),
 
     path('accounts/', include('accounts.urls')),
