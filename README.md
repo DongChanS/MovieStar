@@ -92,7 +92,7 @@ vue를 이용하여 여닫음을 조정할 수 있는 기능 추가
 
 * 영화 정보 + 상세정보 + 리뷰 관리
 
-![Detail_Review](C:\Users\student\Desktop\Detail_Review.gif)
+![Detail_Review](https://user-images.githubusercontent.com/37765338/57835916-8d707e80-77fa-11e9-989f-e46df0010fd4.gif)
 
 * pagination
 
