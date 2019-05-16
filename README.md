@@ -84,7 +84,7 @@
 
 ### 4-1. [패러디] 디시위키 헤더
 
-
+![디시위키_헤더](https://user-images.githubusercontent.com/37765338/57837371-a62e6380-77fd-11e9-81ec-0c849c7a8a24.gif)
 
 vue를 이용하여 여닫음을 조정할 수 있는 기능 추가
 
