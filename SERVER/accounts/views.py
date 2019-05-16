@@ -6,6 +6,10 @@ from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileModelForm, CustomUserChangeForm
 from .models import Profile
+from django.http import JsonResponse
+import sys
+sys.path.append("..")
+from movies.models import Actor
 
 # Create your views here.
 @login_required
@@ -19,7 +23,7 @@ def login(request):
         login_form = AuthenticationForm(request, request.POST)
         if login_form.is_valid():
             auth_login(request, login_form.get_user())
-            return redirect(next_path or 'accounts:change')
+            return redirect(next_path or 'index')
         else:
             return redirect('accounts:login')
     else:
@@ -82,4 +86,25 @@ def change(request):
             'user_change_form' : user_change_form,
             'profile_model_form' : profile_model_form,
         })
+
+@login_required
+def recommend(request):
+    return render(request, 'recommend.html')
+    
+@login_required
+def like(request, actor_pk):
+    actor = get_object_or_404(Actor, pk=actor_pk)    
+    
+    if request.user in actor.like_users.all():
+        # 좋아요 취소하기
+        actor.like_users.remove(request.user)
+        message = "false"
+    else:
+        # 좋아요 새로 하기
+        actor.like_users.add(request.user)
+        message = "true"
         
+    return JsonResponse({'liked' : message})
+    
+    
+    

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+{% load random_image %}
+{% load static %}
+
+{% block content %}
+
+<div class="account-main">
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-primary">제출</button>
+  </form>
+</div>
+<img src="{% static 'good_articles/' %}{% image_num %}.jpg" class="good_article">
+
+{% endblock %}
