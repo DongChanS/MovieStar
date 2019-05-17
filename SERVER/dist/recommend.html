@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block form %}
+<div id="form" class="form">
+    <div class="purple-bar">
+      <div class="row white-text">
+        <div class="col-1" style="margin-top:20px">
+          <a href="{% url 'index' %}"><i class="fas fa-arrow-left" style="margin-left:20px"></i></a>
+        </div> 
+        <div class="col-4" style="margin-top:20px; margin-left : -40px">
+          <span>트롤 무비 추천 폼</span> 
+        </div>
+        <div class="col-7"></div>
+      </div>
+    </div>
+    <div class="pink-container">
+        <div class="white-form container container-small">
+            <div  v-if="!recommendResult">
+              <div class="white-bar">
+                  <h3 class="text-center">Troll Form</h3>
+                  <hr>
+              </div>
+              <div class="form-box description">
+                  하단의 Form을 제출하시면
+                  사용자의 기호에 맞는 적절한 Troll Movie를 추천받으실 수 있습니다.
+                  장르와 배우는 필수적으로 적어야 하며, 그 외 정보를 입력하시면 더 좋은 결과를
+                  얻을 수도? 있습니다.
+              </div>
+              <div class="form-box">
+                  <div>1. 이용자의 나이를 입력해 주세요.</div>
+                  <small>작성 예시)25</small>
+                  <div class="margin-top-20"></div>
+                  <input class="form-input" placeholder="단답형 텍스트">
+                  <hr class="form-dashline"></hr>
+              </div>
+              <div class="form-box">
+                  <div>2. 이용자의 직업을 입력해 주세요.</div>
+                  <small>작성 예시)프로그래머</small>
+                  <div class="margin-top-20"></div>
+                  <input class="form-input" placeholder="단답형 텍스트">
+                  <hr class="form-dashline"></hr>
+              </div>
+              <div class="form-box">
+                  <div>3. 선호하는 장르의 [번호]를 입력해 주세요.<span class="form-require">*</span></div>
+                  <small>가능한 장르 목록)</small>
+                  <div></div>
+                  <small>0.애니메이션, 1.전쟁, 2.멜로/로맨스, 3.다큐멘터리, 4.사극, 5.서부극(웨스턴), 6.공연, 7.기타, 8.범죄, 9.가족
+                  10.스릴러, 11.SF, 12.어드벤처, 13.코미디, 14.판타지, 15.미스터리, 16.액션, 17. 뮤지컬
+                  18.드라마, 19.성인물(에로) 20.공포(호러)</small>
+                  <p></p>
+                  <small>작성 예시)1</small>
+                  <div></div>
+                  <small class="form-require">반드시 숫자로 입력하셔야 합니다!</small>
+                  <div class="margin-top-20"></div>
+                  <small class="form-require" v-if="genreWaiting">필수 입력 항목입니다.</small>
+                  <input v-model="genre" :class="{'form-input' : true, 'form-waiting' : genreWaiting}" @focus="genreClick" placeholder="단답형 텍스트">
+                  <hr class="form-dashline"></hr>
+              </div>
+              <div class="form-box">
+                  <div>4. 선호하는 배우를 입력해 주세요.<span class="form-require">*</span></div>
+                  <small>밑의 검색창에서 배우를 검색하고 방향키를 누르시면 배우가 등장합니다.</small>
+                  <div class="margin-top-20"></div>
+                  <small class="form-require" v-if="actorWaiting">필수 입력 항목입니다.</small>
+                  <input v-model="actorKeyword" :class="{'form-input' : true, 'form-waiting' : actorWaiting}" @focus="actorClick" placeholder="검색하여 사용">
+                  <!--
+                      1. 검색창을 클릭하면 이벤트 발동
+                          (3번의 행위를 하였는지를 검증하는)
+                      2. 값이 들어오면 검색을 해준다.
+                      3. 검색을 통해서 고르는 창이 나오고, 고르면 값을 다른 곳에 등록시킨다.
+                  -->
+                  <hr class="form-dashline"></hr>
+                  <div class="row" v-if="searchOpen">
+                      <div class="col-4 form-searchResult" @click="actorTake(actorRes.name)" v-for="actorRes in actorSearchResult">
+                          <img :src="actorRes.search_image | imageFilter">
+                          [[actorRes.name]]
+                      </div>    
+                  </div>
+                  <div class="text-center" v-if="actorKeyword && !actorSearchResult.length">
+                      검색결과가 존재하지 않습니다..ㅠㅠ
+                  </div>
+                  <div class="text-center">
+                      [[actor | nameFilter]]
+                  </div>
+              </div>
+              <div class="text-center form-button">
+                  <div v-if="!genreWaiting && !actorWaiting && loading">
+                    <div class="spinner-grow text-primary" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-secondary" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-danger" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-warning" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-info" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-light" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="spinner-grow text-dark" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <a href="{% url 'index' %}"><button class="btn btn-outline-primary">뒤로가기</button></a>
+                    <button @click="submit" class="btn btn-primary">제출하기</button>
+                  </div>
+              </div>
+            </div>
+            <div v-else class="text-center" style="margin-top:150px">
+              <h2 class="text-center" style="font-family : 'Black Han Sans', sans-serif; position: relative; top: 10px;">추천 결과</h2>
+              <img :src="recommendResult.image | imageFilter" class="result-img">
+      
+              <div class="form-button">
+                <a href="{% url 'index' %}"><button class="btn btn-outline-primary">메인 페이지로</button></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>    
+<script>
+    let vm = new Vue({
+        el : "#form",
+        delimiters : ['[[',']]'],
+        data : {
+            genre : '',
+            actorKeyword : '',
+            actor : '',
+            genreWaiting : false,
+            genreClicked : false,
+            actorWaiting : false,
+            actorClicked : false,
+            url : '/api/v1',
+            actors : [],
+            actorSearchResult : [],
+            loading : false,
+            searchOpen : false,
+            recommendResult : '',
+        },
+        methods : {
+            genreClick : function(){
+                this.genreClicked = true
+                this.genreCheck()
+            },
+            actorClick : function(){
+                this.actorClicked = true
+                this.actorCheck()
+            },
+            genreCheck : function(){
+                if (this.isPositiveInteger(this.genre) && this.genre < 21){
+                    this.genreWaiting = false
+                } else {
+                    this.genreWaiting = true
+  
+                }
+            },
+            actorCheck : function(){
+                if (this.actor){
+                    this.actorWaiting = false
+                } else {
+                    this.actorWaiting = true
+                }
+            },
+            isPositiveInteger : function (n) {
+                return n >>> 0 === parseFloat(n);
+            },
+            actorTake : function(name){
+                this.actor = name
+                this.actorCheck()
+                this.actorKeyword = ''
+                this.searchOpen = false
+            },
+            submit : function(){
+                
+                if (!this.genreWaiting && !this.actorWaiting && this.actorClicked && this.genreClicked){
+                  this.loading = true
+                  setTimeout(() => {
+                    let url = `${this.url}/recommend/${this.genre}/${this.actor}/`
+                    axios.get(url)
+                      .then((res) => {
+                        this.recommendResult = res.data
+                        this.loading = false
+                      })      
+                  }, 2000)
+                } else {
+                    alert('아직 필수 컬럼의 값들이 입력되지 않았습니다!')
+                }
+            },
+        },
+        watch : {
+            genre : function(){
+                this.genreCheck()
+            },
+            actorKeyword : function(keyWord){
+                this.searchOpen = true
+                if (keyWord !== ""){
+                    this.actorSearchResult = this.actors.filter((actor) => {
+                        let name = actor.name
+                        return name.includes(keyWord)
+                    })
+                } else {
+                    this.actorSearchResult = []
+                }
+                this.actorCheck()
+            }
+        },
+        beforeMount : function(){
+            axios.get(`${this.url}/actor/`)
+            .then((res) => {
+                this.actors = res.data
+            })
+        },
+        filters : {
+          imageFilter : function(image){
+            return decodeURIComponent(image)
+          },
+          nameFilter : function(name){
+              if (name) {
+                  return `선택한 배우 : ${name}`
+              } return ''
+          }
+        }
+    })
+</script>
+
+{% endblock %}

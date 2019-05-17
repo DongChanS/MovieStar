@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div id="app">
+    <h1 class="text-center" style="height:40px">　</h1>
+    <div class="actor row" v-if="!isDetailPage">
+      <div class="col-4" v-for="(actor, actor_idx) in actors">
+        <div @click="getDetail(actor_idx)" class="actor-card card">
+          <i class="fas fa-crown" style="font-size: 3rem;text-align: center;color: gold;"></i>
+          <img :src="actor.profile_image | imageFilter" class="card-img-top movie-img" alt="Image Not Found"
+          style="border-radius: 50%; margin-top: 10px;">
+          <div class="card-body">
+            <p class="card-text">[[actor.name | limitLength(6) ]]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <div id="memo-container">
+        <div class="memo row actor-page" style="height : 350px;">
+          <div class="col-4">
+            <img :src="detailActor.profile_image | imageFilter" class="card-img-top movie-img" alt="Image Not Found">            
+          </div>
+          <div class="col-7">
+            <div class="movie-info actor-info">
+              <h2 class="movie-title title">[[detailActor.name]]</h2>
+              <div><span class="sub-title">[출연작]</span> [[detailMovies | limitLength(35)]]</div>
+              <div><span class="sub-title">[출연횟수]</span> [[detailActor.movies_cnt]]</div>
+              <div @click="like" class="heart">
+                <i v-if="isLiking" class="fas fa-heart"></i>
+                <i v-else class="fas fa-heart-broken"></i>
+              </div>
+              <div class="text-center">
+                <div v-if="isLiking">이 배우를 좋아하고 있습니다.</div>
+                <div v-else>하트를 눌러 배우를 좋아해주세요..</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-1">
+            <i @click="restore" class="far fa-window-close"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- paginate -->
+    <div class="paginate">
+      <a @click="setCurPage(10*maxPageNum)" v-if="maxPageNum >= 1"> <| 이전</a>
+      <a v-for="n in 10" @click="setCurPage(n + 10*maxPageNum)" :class="{ current : isCurPage(n + 10*maxPageNum) }">[[n + 10*maxPageNum ]]</a>
+      <a @click="setCurPage(10*maxPageNum + 11)">다음 |></a>
+    </div>
+</div>    
+
+<script>
+    const vm = new Vue({
+        delimiters: ['[[', ']]'],
+        el :"#app",
+        data : {
+            url : '/api/v1/',
+            curPage : 1,
+            actors : [],
+            isDetailPage : false,
+            detailActor : '',
+            detailMovies : '',
+        },
+        methods : {
+          setCurPage : function(n){
+            this.curPage = n;
+          },
+          isCurPage : function(n){
+            return n === this.curPage
+          },
+          getDetail : async function(actor_idx){
+            this.isDetailPage = true;
+            this.detailActor = this.actors[actor_idx]
+            this.getActMovies(this.detailActor)
+          },
+          restore : function(){
+            this.isDetailPage = false;
+          },
+          getActMovies : function(actor){
+            if (actor.filmography) {
+              this.detailMovies = actor.filmography
+            } else {
+              axios.get(`${this.url}actor/${actor.id}`)
+                   .then((res) => (res.data))
+                   .then((objectArray) => {
+                     return objectArray.map((object) => (object.name))
+                   })
+                   .then((nameArray) => {
+                     this.detailMovies = nameArray.join("|")
+                   })
+            }
+          },
+          like : function(){
+            if ('{{user.is_authenticated}}' === "True"){
+              axios.get(`/accounts/like/${this.detailActor.id}`)
+                  .then((res) => {
+                    if (res.data.liked === true){
+                      // actor.like_users에서 추가
+                      this.detailActor.like_users.push(parseInt("{{user.id}}"))
+                    } else {
+                      // actor.like_users에서 삭제
+                      let user_idx = this.detailActor.like_users.indexOf(parseInt("{{user.id}}"))
+                      this.detailActor.like_users.splice(user_idx, 1)
+                    }
+                  })
+            } else {
+              alert('좋아요 기능은 로그인한 유저에게만 제공됩니다.')
+            }
+          },
+        },
+        filters : {
+          limitLength : function(str, length){
+            if (str.length > length){
+              return str.slice(0, length-1) + "...";
+            } return str.slice(0, length);
+          },
+          imageFilter : function(image){
+            return decodeURIComponent(image)
+          },
+        },
+        computed : {
+          maxPageNum : function(){
+            return parseInt((this.curPage-1)/10)
+          },
+          isLiking : function(){
+            if ('{{user.is_authenticated}}' === "True"){
+              if ( this.detailActor.like_users.includes(parseInt("{{user.id}}"))){
+                return true
+              } return false
+            } return false
+          }
+        },
+        watch : {
+          curPage : async function(){
+            const res = await axios.get(`${this.url}actor/page/${this.curPage-1}`)
+            this.actors = res.data
+          }
+        },
+        created : async function(){
+          const res = await axios.get(`${this.url}actor/page/${this.curPage-1}`)
+          this.actors = res.data
+        }
+    })
+    
+</script>
+
+{% endblock %}

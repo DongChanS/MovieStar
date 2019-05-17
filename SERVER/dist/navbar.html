@@ -12,7 +12,10 @@
       <!-- 로그인 -> Profile, 로그아웃 // 로그인안됨 -> 로그인, 회원가입 -->
       {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'accounts:change' %}">ProfileChange</a>
+          <a class="nav-link" href="{% url 'accounts:profile' user.id %}">{{user}}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'accounts:change' %}">Profile Change</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>

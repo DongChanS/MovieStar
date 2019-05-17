@@ -70,9 +70,9 @@ a {
     justify-content : flex-start;
 }
 
-.nav-link {
-    display: inline;
-}
+/*.nav-link {*/
+/*    display: inline;*/
+/*}*/
 
 .navbar a {
     font-weight : 700;
@@ -142,9 +142,20 @@ a {
     color : red;
 }
 
+.sidebar-nav {
+    margin-top : 20px;
+}
+
 .good_article {
     margin-top : 15px;
     width : 100%;
+}
+
+.unicef-banner {
+    width : 100%;
+    position : absolute;
+    height: 20%;
+    bottom: 0.4%;
 }
 
 /* movie page */
@@ -323,11 +334,11 @@ em {
 
 .heart {
     text-align: center;
-    position: relative;
-    top : 5%;
-    bottom: 20%;
-    right: 15%;
-    left: 5%;
+    /*position: relative;*/
+    /*top : 5%;*/
+    /*bottom: 20%;*/
+    /*right: 15%;*/
+    /*left: 5%;*/
     cursor : pointer;
 }
 
@@ -344,7 +355,7 @@ em {
 /* recommend page */
 
 .form {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Nanum Gothic', sans-serif;
 }
 
 .purple-bar {
@@ -373,6 +384,11 @@ em {
     font-size : 2rem;
     position: relative;
     top: 10px;
+}
+
+.white-text {
+    font-size : 2rem;
+    color : #fff;
 }
 
 .description {
@@ -407,9 +423,14 @@ em {
     padding-left: .25em;
 }
 
-.form-button {
-    margin : 40px;
+.margin-top-20 {
+    margin-top : 20px;
 }
+
+.white-form small {
+    margin-top : 20px;
+}
+
 
 .form-searchResult {
     height : 30px;
@@ -431,4 +452,10 @@ em {
 
 .result-form {
     height : 1000px;
+}
+
+/*profile page*/
+
+.profile-header {
+    font-family : 'Black Han Sans', sans-serif;
 }

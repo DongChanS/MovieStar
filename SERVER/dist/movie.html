@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div id="app">
+    <div style="height:40px">　</div>
+    <div class="row" v-if="!isDetailPage">
+      <div class="movie-card col-4" v-for="(movie, movies_idx) in movies">
+        <div @click="trollPopUp(movie.troll)" class="text-center troll_score">[[movie.troll]]</div>
+        <div @click="getDetail(movies_idx)" class="card">
+          <img :src="movie | imageFilter" class="card-img-top movie-img" alt="Image Not Found">
+          <div class="card-body">
+            <p class="card-text">[[movie.name | limitLength(6) ]]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <div id="memo-container">
+        <div class="memo row" style="height : 350px;">
+          <div class="col-4">
+            <img :src="detailMovie | imageFilter" class="card-img-top movie-img" alt="Image Not Found">            
+          </div>
+          <div class="col-7">
+            <div class="movie-info">
+              <h2 class="movie-title title">[[detailMovie.name]]</h2>
+              <!-- 정보 표시하기 -->
+              <div>[[detailMovie.duration]]분 | [[detailMovie.open_day]] 개봉</div>
+              <div><span class="sub-title">[평점]</span> [[avgScore | scoreFilter ]]점</div>
+              <div><span class="sub-title">[제작]</span> [[detailMovie.director_list]]</div>
+              <div><span class="sub-title">[배우]</span> [[detailMovie.actor_list | limitLength(20) ]]</div>
+              <div><span class="sub-title">[국내]</span> [[detailMovie.watch_grade]]</div>
+              <div><span class="sub-title">[관객]</span> [[detailMovie.audiance]]명</div>
+              <div style="font-style : italic">[[detailMovie.story_header | zeroFilter | limitLength(50) ]]</div>
+              {% if user.is_authenticated %}
+              <button @click="changeOpenForm"  class="btn-danger">
+                <span v-if="!creatIng">리뷰 작성하기</span>
+                <span v-else>목록으로 돌아가기</span>
+              </button>
+              {% else %}
+              <a @click="loginRequire" href="{% url 'accounts:login' %}">
+                <button class="btn-danger">
+                  <span>리뷰 작성하기</span>
+                </button>
+              </a>
+              {% endif %}
+              
+            </div>
+          </div>
+          <div class="col-1">
+            <i @click="restore" class="far fa-window-close"></i>
+          </div>
+        </div>
+        <!--review list & review form-->
+        <div class="memo" style="height : 400px;">
+          <!-- review list -->
+          <div v-if="!creatIng && !updatIng && !viewIng">
+            <!-- 리뷰가 존재할 경우 -->
+            <div v-if="reviews.length">
+              <h5 class="title">리뷰 목록</h5>
+              <small>리뷰 총 [[reviews.length]]건</small>
+              <hr id="review-title-hr">
+              
+              <div class="temp-review" v-for="(review, idx) in reviews">
+                <div class="row">
+                  <div class="col-2">
+                    <strong class="review-title">[[review.title | limitLength(7)]]</strong> 
+                  </div>
+                  <div class="col-5">
+                    <span class="user">
+                      <a :href="review.user | linkFilter">[[user_names[idx] | limitLength(8) ]]</a>
+                      <em>[[review.created_at | limitLength(11) ]]</em>
+                      <em style="color : #f24443">점수 [[review.score]]</em>
+                    </span>
+                  </div>
+                  <div class="col-5">
+                    <span v-if="ownReview(review.user)">
+                      <button @click="deleteReview(review.id, idx)" class="btn-danger">삭제</button>
+                      <button @click="changeUpdateForm(idx)" class="btn-info">수정</button>
+                    </span>
+                    <button @click="changeViewForm(idx)" class="btn-success">조회</button>
+                  </div>
+                </div>
+                <p>[[review.content | limitLength(100)]]</p>
+                <hr class="temp-hr">
+              </div>
+            </div>
+            <div v-else>
+              <h3 class="text-center">리뷰가 없습니다...</h3>
+            </div>
+          </div>
+          <div v-else-if="!creatIng && updatIng && !viewIng">
+            <h5 class="title">
+              리뷰 수정하기
+              <i @click="changeUpdateForm(updatingIdx)" class="far fa-window-close"></i>
+            </h5>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Title</span>
+                </div>
+                <input v-model="writingReview.title" type="text" class="form-control">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Score</span>
+                </div>
+                <input v-model="writingReview.score" type="number" class="form-control" 
+                min="1" max="10" style="text-align:center">
+                <button @click="updateReview(reviews[updatingIdx].id)" class="btn btn-secondary" type="button">제출</button>
+            </div>
+            <div class="input-group" style="height:250px">
+              <div class="input-group-prepend">
+                <span class="input-group-text" style="display:inline">Content</span>
+              </div>
+              <textarea v-model="writingReview.content" class="form-control" aria-label="With textarea"></textarea>
+            </div>
+          </div>
+          <div v-else-if="!creatIng && !updatIng && viewIng">
+            <h5 class="title">
+              리뷰 조회하기
+              <i @click="changeViewForm(viewingIdx)" class="far fa-window-close"></i>
+            </h5>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Title</span>
+                </div>
+                <input :value="reviews[viewingIdx].title" readonly type="text" class="form-control">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">Score</span>
+                </div>
+                <input :value="reviews[viewingIdx].score" readonly type="number" class="form-control" 
+                min="1" max="10" style="text-align:center">
+            </div>
+            <div class="input-group" style="height:250px">
+              <div class="input-group-prepend">
+                <span class="input-group-text" style="display:inline">Content</span>
+              </div>
+              <textarea :value="reviews[viewingIdx].content" readonly class="form-control" aria-label="With textarea"></textarea>
+            </div>
+          </div>
+          <!-- review form-->
+          <div v-else>
+            <h5 class="title">리뷰 작성하기</h5>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Title</span>
+              </div>
+              <input v-model="writingReview.title" type="text" class="form-control" placeholder="Title">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Score</span>
+              </div>
+              <input v-model="writingReview.score" type="number" class="form-control" min="1" max="10" placeholder="Score"
+              style="text-align:center">
+              <button @click="writeReview" class="btn btn-secondary" type="button">제출</button>
+            </div>
+            <div class="input-group" style="height:250px">
+              <div class="input-group-prepend">
+                <span class="input-group-text" style="display:inline">Content</span>
+              </div>
+              <textarea v-model="writingReview.content" class="form-control" aria-label="With textarea"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- paginate -->
+    <div class="paginate">
+      <a @click="setCurPage(10*maxPageNum)" v-if="maxPageNum >= 1"> <| 이전</a>
+      <a v-for="n in 10" @click="setCurPage(n + 10*maxPageNum)" :class="{ current : isCurPage(n + 10*maxPageNum) }">[[n + 10*maxPageNum ]]</a>
+      <a @click="setCurPage(10*maxPageNum + 11)">다음 |></a>
+    </div>
+</div>    
+
+<script>
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+
+    const vm = new Vue({
+        delimiters: ['[[', ']]'],
+        el :"#app",
+        data : {
+            url : '/api/v1/',
+            curPage : 1,
+            movies : [],
+            isDetailPage : false,
+            detailMovie : {},
+            reviews : [],
+            creatIng : false,
+            updatIng : false,
+            viewIng : false,
+            viewingIdx : 0,
+            updatingIdx : 0,
+            user_names : [],
+            writingReview : {
+              title : '',
+              content : '',
+              score : 1,
+            },
+            sumScore : 0,
+        },
+        methods : {
+          setCurPage : function(n){
+            this.curPage = n;
+          },
+          isCurPage : function(n){
+            return n === this.curPage
+          },
+          getDetail : async function(movies_idx){
+            this.sumScore = 0
+            this.isDetailPage = true;
+            this.detailMovie = this.movies[movies_idx]
+            
+            let res = await axios.get(`${this.url}movies/${this.detailMovie.id}/reviews/`)
+            this.reviews = res.data
+            
+            let user_res = await axios.get(`${this.url}movies/${this.detailMovie.id}/users/`)
+            this.user_names = user_res.data.names
+            
+            this.reviews.forEach((review) => {
+              this.sumScore += review.score
+            })
+          },
+          restore : function(){
+            this.isDetailPage = false;
+            this.writingReview.title = ""
+            this.writingReview.content = ""
+            this.writingReview.score = 1;
+          },
+          writeReview : function(){
+            
+            let toWrite = {...this.writingReview}
+            axios.post(`${this.url}movies/${this.detailMovie.id}/reviews/`, toWrite)
+                .then((res) => {
+                  let newReview = res.data
+                  newReview.user = '{{user.id}}'
+                  this.user_names.push('{{user}}')
+                  let date = new Date()
+                  newReview.created_at = date.toUTCString()
+                  
+                  this.reviews.push(newReview)
+                  this.sumScore += newReview.score
+                })
+                .then(() => {
+                  alert('성공적으로 작성되었습니다.')
+                  this.changeOpenForm()
+                })
+                .catch((e) => (alert(`정상적인 값이 아닙니다. 다시 시도해주세요!\n Error Information : ${e}`)))
+          },
+          deleteReview : function(db_id, array_idx){
+            axios.delete(`${this.url}reviews/${db_id}/`)
+              .then((res) => (console.log(res)))
+              .then(() => {
+                this.sumScore -= this.reviews[array_idx].score
+                this.reviews.splice(array_idx, 1)
+              })
+              .then(() => {
+                alert('성공적으로 삭제되었습니다.')
+              })
+          },
+          updateReview : function(db_id){
+            let toUpdate = {...this.writingReview}
+            
+            axios.put(`${this.url}reviews/${db_id}/`, toUpdate)
+              .then(() => {
+                this.sumScore += (toUpdate.score - this.reviews[this.updatingIdx].score)
+                this.reviews[this.updatingIdx].score = toUpdate.score
+                this.reviews[this.updatingIdx].title = toUpdate.title
+                this.reviews[this.updatingIdx].content = toUpdate.content
+                })
+              .then(() => {
+                alert('성공적으로 수정되었습니다.')
+                this.changeUpdateForm()
+              })
+              .catch((e) => (alert(`정상적인 값이 아닙니다. 다시 시도해주세요!\n Error Information : ${e}`)))
+          },
+          changeOpenForm : function(){
+            this.creatIng = !this.creatIng;
+            this.writingReview.title = ""
+            this.writingReview.content = ""
+            this.writingReview.score = 1;
+          },
+          changeUpdateForm : function(array_idx){
+            this.updatIng = !this.updatIng
+            this.updatingIdx = array_idx
+            if (this.updatIng == true){
+              this.writingReview.title = this.reviews[array_idx].title
+              this.writingReview.content = this.reviews[array_idx].content
+              this.writingReview.score = this.reviews[array_idx].score;
+            }
+          },
+          changeViewForm : function(array_idx){
+            this.viewIng = !this.viewIng;
+            this.viewingIdx = array_idx
+          },
+          trollPopUp : function(score){
+            alert(`     Troll Score : ${score}\n\nTroll Score란? : 영화 평점, 누적관객수, 리뷰 작성숫자를 합산하여 만들어진 점수입니다!\n평점이 낮을 수록, 누적관객수가 적을 수록, 리뷰가 많을 수록 Troll Score가 높습니다!`)
+          },
+          ownReview : function(id){
+            if ('{{user.is_authenticated}}' == 'True'){
+              return '{{user.id}}' == id
+            } return false
+          },
+          loginRequire : function(){
+            alert('로그인을 하셔야 리뷰를 작성하실 수 있습니다.')
+          }
+        },
+        filters : {
+          limitLength : function(str, length){
+            if (str.length > length){
+              return str.slice(0, length-1) + "...";
+            } return str.slice(0, length);
+          },
+          imageFilter : function(movie){
+            if (movie) {
+              return "https://" + movie.image.substring(10)    
+            } return ''
+          },
+          zeroFilter : function(string){
+            if (string == 0){
+              return ''
+            } return string
+          },
+          scoreFilter : function(number){
+            let num_str = number.toString()
+            let num_array = num_str.split('.')
+            if (num_array.length == 1){
+              return num_str
+            } else {
+              return num_array[0] + "." + num_array[1].slice(0,2)
+            }
+          },
+          linkFilter : function(id){
+            return `/accounts/profile/${id}/`
+          }
+        },
+        computed : {
+          maxPageNum : function(){
+            return parseInt((this.curPage-1)/10)
+          },
+          avgScore : function(){
+            if (this.reviews.length === 0){
+              return 0
+            } else return this.sumScore / this.reviews.length
+          }
+        },
+        watch : {
+          curPage : async function(){
+            const res = await axios.get(`${this.url}movies/page/${this.curPage-1}/`)
+            this.movies = res.data
+          },
+        },
+        created : async function(){
+          const res = await axios.get(`${this.url}movies/page/${this.curPage-1}/`)
+          this.movies = res.data
+        }
+    })
+    
+</script>
+
+{% endblock %}
