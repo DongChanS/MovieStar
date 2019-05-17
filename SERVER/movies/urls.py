@@ -17,6 +17,7 @@ urlpatterns = [
     path('actor/page/<int:page_num>/', views.actor_page, name="actor_page"),
     path('actor/', views.actor_list, name="actor_list"),
     path('actor/<int:actor_pk>/', views.actor_movies, name="actor_movies"),
+    path('actor/user/<int:user_id>/', views.like_actors, name="like_actors"),
     
     path('recommend/<int:genre_pk>/<str:actor_name>/', views.recommend, name="recommend"),
     path('docs/', get_swagger_view(title="API문서")),

@@ -165,3 +165,12 @@ def recommend(request,genre_pk,actor_name):
     movie = max_movies[0]
     serializer = MovieSerializer(movie, many=False)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def like_actors(request, user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    actors = user.like_actors.all()
+    
+    serializers = ActorSerializer(actors, many=True)
+    return Response(serializers.data)
+    
