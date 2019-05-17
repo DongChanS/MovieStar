@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div style="font-family : 'Nanum Gothic'">
+  
+<h1 class="text-center profile-header">
+  <p></p>
+  Profile
+  <p></p>
+  
+</h1>
+
+<div class="row mt-5">
+  <div class="col-3 offset-1">
+    {% if person.profile.image %}
+    <img src="{{person.profile.image.url}}" class="img-fluid profile-img">
+    {% else %}
+    <img src="{% static 'img/default_troll.png' %}" class="img-fluid profile-img">
+    {% endif %}
+  </div>
+  <div class="col-8 text-center">
+    <h3 class="d-inline profile-header">{{person.username}}</h3>
+    {% if person.profile.nickname %}
+    <div>{{person.profile.nickname}}</div>
+    {% else %}
+    <div>별명이 없습니다.</div>
+    {% endif %}
+    {% if person.profile.description %}
+    <div>{{person.profile.description}}</div>
+    {% else %}
+    <div>설명이 없습니다.</div>
+    {% endif %}
+  </div>
+</div>
+
+<h1 class="text-center profile-header">
+  <p></p>
+  이 유저가 작성한 댓글들
+  <p></p>
+</h1>
+
+<table class="table table-striped table-sm">
+  <thead>
+    <th>작성일자</th>
+    <th>점수</th>
+    <th>Content</th>
+    <th>Movie</th>
+  </thead>
+  <tbody>
+    {% for review in reviews %}
+    <tr>
+      <td>{{review.created_at}}</td>
+      <td>{{review.score}}</td>
+      <td>{{review.content}}</td>
+      <td>{{review.movie}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h1 class="text-center profile-header">
+  <p></p>
+  이 유저가 좋아하는 배우들
+  <p></p>
+</h1>
+<div class="row" id="app">
+  <div class="col-4" v-for="actor in actors">
+    <div class="card">
+      <img :src="actor.profile_image | imageFilter" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">[[actor.name]]</h5>
+      </div>
+    </div>
+  </div>
+</div>
+  
+</div>
+
+
+<script>
+    let vm = new Vue({
+      el : "#app",
+      delimiters : ['[[',']]'],
+      data : {
+        actors : []
+      },
+      filters : {
+        imageFilter : function(url){
+          return decodeURIComponent(url)
+        }
+      },
+      created : function(){
+        let id = '{{person.id}}'
+        axios.get(`/api/v1/actor/user/${id}/`)
+          .then((res) => {
+            this.actors = res.data
+            console.log(this.actors)
+          })
+      },
+    })
+  
+</script>
+
+{% endblock %}

@@ -39,7 +39,7 @@ def signup(request):
         if user_creation_form.is_valid():
             user = user_creation_form.save()
             auth_login(request, user)
-            return redirect('accounts:change')
+            return redirect('index')
         else:
             return redirect('accounts:signup')
     else:
@@ -55,7 +55,7 @@ def password(request):
         if password_form.is_valid():
             user = password_form.save()
             auth_login(request, user)
-            return redirect('profile', request.user.username)
+            return redirect('index')
         else:
             return redirect('accounts:password')
     else:
@@ -76,7 +76,7 @@ def change(request):
         if profile_model_form.is_valid() and user_change_form.is_valid():
             user = user_change_form.save()
             profile = profile_model_form.save()
-            return redirect('profile', request.user.username)
+            return redirect('index')
         else:
             return redirect('accounts:change')
     else:
@@ -98,13 +98,32 @@ def like(request, actor_pk):
     if request.user in actor.like_users.all():
         # 좋아요 취소하기
         actor.like_users.remove(request.user)
-        message = "false"
+        message = False
     else:
         # 좋아요 새로 하기
         actor.like_users.add(request.user)
-        message = "true"
+        message = True
         
     return JsonResponse({'liked' : message})
     
+def profile(request, user_id):
+    user = get_object_or_404(get_user_model(), pk=user_id)
     
+    """
+    1. 유저정보 <- user 오브젝트
+        - 프로필 사진
+        - 개인정보
+    2. 이 유저가 달았던 댓글들
+        - 유저의 리뷰들을 뽑아서가야함
+    3. 이 유저가 좋아하는 배우들
+        - 유저가 좋아하는 배우들 가져가야함
+    """
+    reviews = user.review_set.all()
+    actors = user.like_actors.all()
+    
+    return render(request, 'accounts/profile.html', {
+        'reviews' : reviews,
+        'actors' : actors,
+        'person' : user,
+    })
     

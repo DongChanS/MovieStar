@@ -9,7 +9,7 @@
   <div class="row">
     {% include 'sidebar.html' %}
     <main role="main" class="col-md-9 ml-sm-auto col-sm-10 px-4 border border-dark">
-      <h3>Profile Change</h3>
+      <h3 style="margin-top:20px">Profile Change</h3>
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -21,7 +21,9 @@
     </main>
   </div>
 </div>
-<img src="{% static 'good_articles/' %}{% image_num %}.jpg" class="good_article">
-
+<div style="position:relative;">
+  <img src="{% static 'good_articles/' %}{% image_num %}.jpg" class="good_article">
+  <a href="https://www.unicef.or.kr/donation/"><img class="unicef-banner" src="{% static 'img/unicef.jpg' %}"></a>
+</div>
 
 {% endblock %}
